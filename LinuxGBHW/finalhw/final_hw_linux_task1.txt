@@ -1,0 +1,11 @@
+#!/bin/bash
+inputDir=$1
+if [ -d $inputDir ]
+then
+    rm -v $inputDir/*.bak
+    rm -v $inputDir/*.tmp
+    rm -v $inputDir/*.backup
+    echo "Files deleted"
+else
+    echo "have't this directory!"
+fi

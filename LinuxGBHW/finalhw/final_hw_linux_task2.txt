@@ -1,0 +1,29 @@
+#!/bin/bash
+
+target=$1
+fileowner=""
+
+if [ -n $target ]
+    then
+        echo "dir is ok, continue"
+    else
+        echo "dir is not exists, exit"
+        exit 1
+fi
+
+files=$(ls $target)
+
+for h in $files
+do
+    fileowner=$(stat -c %U $target/$h)
+    if [ -d $target/$fileowner ]
+        then
+            sudo cp -p $target/$h $target/$fileowner
+        else
+            mkdir $target/$fileowner
+            sudo cp -p $target/$h $target/$fileowner
+    fi
+done
+
+echo "done"
+ls $target

@@ -1,0 +1,102 @@
+* Установить Nginx и настроить его на работу с PHP-FPM.
+
+sudo apt install nginx
+curl localhost
+cd /etc/nginx
+ll
+nano nginx.conf
+
+Проверка работы настроенного конфига 
+sudo nginx -t
+
+Перезапуск настроенного nginx
+
+sudo systemctl reload nginx
+
+
+PHP-fpm
+apt install php8.1-fpm
+
+cd /etc/php/8.1/fpm
+nano www.conf
+cd /etc/nginx
+cd sites-enabled
+nano default
+
+  location ~ \.php$ {
+                include snippets/fastcgi-php.conf;
+                root /var/www/html;
+        #       # With php-fpm (or other unix sockets):
+                fastcgi_pass unix:/run/php/php8.1-fpm.sock;
+        #       # With php-cgi (or other tcp sockets):
+        #       fastcgi_pass 127.0.0.1:9000;
+        }
+systemctl reload nginx
+
+* Установить Apache. Настроить обработку PHP. Добиться одновременной работы с Nginx.
+
+Установка:
+sudo apt install apache2
+Тестирование конфигурации:
+sudo apachectl reload apache2
+Конфигурация:
+/etc/apache2/*
+Основной файл:
+/etc/apacge2/apache2.conf
+Блоки:
+<VirtualHost></VirtualHost>
+Директивы:
+ServerName site.ru
+
+Установка и настройка PHP
+apt install libapache2-mod-php8.1 php8.1
+cd /etc/apache2/
+cd mods-enabled/
+cd /var/www/html
+cat > info.php
+?>php
+phpinfo();
+?>
+
+
+При запущенном nginx, apache2 запустится с конфигами по умолчанию не может, т.к. 80 порт (Прописанный по умолчанию в конфиге apache2) уже занят сервисом nginx (там тоже по умолчанию 80 порт) один порт не может обрабатывать 2 сервиса, поэтому необходимо перенаправить apache2 на другой порт
+
+sudo su
+cd /etc/apache2
+ll
+nano ports.conf
+переделываем 1 listen 80 -> listen <номер порта> (В нашем случае listen 8080) 
+systemctl start apache2
+systemctl status apache2
+дальнейшая конфигурация (для сайта)
+cd sites-enabled/
+nano 000-default.conf
+меняем:
+<VirtualHost *:80 -> *:8080
+
+* Настроить схему обратного прокси для Nginx (динамика - на Apache).
+
+cd /etc/nginx/
+cd sites-enabled/
+su
+nano default 
+
+                proxy_pass http://localhost:8080;
+                proxy_set_header Host $host;
+                proxy_set_header X-Forwarder-For $proxy_add_x_forwarded_for;
+                proxy_set_header X-Real_Ip $remote_addr;
+^x
+
+* Установить MySQL. Создать новую базу данных и таблицу в ней.
+
+sudo apt install mysql-server-8.0
+sudo mysql
+mysql> CREATE DATABASE gb;
+mysql> use gb;
+mysql> CREATE TABLE test(i INT);
+mysql> INSERT INTO test (i) VALUES (1),(2),(3),(4);
+mysql> SELECT * FROM test;
+mysql> exit
+
+* * Установить пакет phpmyadmin и запустить его веб-интерфейс для управления MySQL.
+* * Настроить схему балансировки трафика между несколькими серверами Apache на стороне Nginx с помощью модуля ngx_http_upstream_module.

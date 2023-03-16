@@ -1,0 +1,61 @@
+1. Подключить дополнительный репозиторий на выбор: Docker, Nginx, Oracle MySQL. Установить любой пакет из этого репозитория.
+
+sudo apt-get install nginx
+для удаления используется флаг --remove
+sudo apt-add-repository --remove "указание на репозиторий"
+
+
+2. Установить и удалить deb-пакет с помощью dpkg.
+
+dpkg — это, прежде всего, инструмент для установки уже доступных пакетов Debian (поскольку он ничего не загружает). Чтобы установить пакет, используется опция -i или --install.
+
+dpkg -i flashpluginnonfree_2.8.2+squeeze1_i386.deb
+
+3. Установить и удалить snap-пакет.
+
+sudo snap install gimp
+sudo snap --remove gimp
+
+4. Добавить задачу для выполнения каждые 3 минуты (создание директории, запись в файл).
+
+Зарание нужно создать файл с расширением sh (например reshenie.sh)
+mkdir sem4
+далее нужно раздать разрешение на файл и директорию длявозможности использовать их с правами root
+chmod 700 reshenie.sh
+chmod 700 /home/vboxuser/sem4/
+
+crontab -e
+
+*/3 * * * * reshenie.sh
+
+reshenie.sh:
+
+!#bin/bash
+mkdir /home/vboxuser/sem4/newdir/
+touch /home/vboxuser/sem4/newdir/filenew
+cat >> /home/vboxuser/sem4/newdir/filenew<<TEXT
+>Hello
+>world
+>TEXT
+
+
+5. * Подключить PPA-репозиторий на выбор. Установить из него пакет. Удалить PPA из системы.
+
+sudo add-apt-repository ppa:ondrej/php
+sudo add-apt-repository --remove ppa:ondrej/php
+
+6. * Создать задачу резервного копирования (tar) домашнего каталога пользователя. Реализовать с использованием пользовательских crontab-файлов.
+
+nano reshenienew.sh
+!#bin/bash
+tar -cf home.tar /home
+^X
+Y
+ENTER
+
+chmod 700 reshenienew.sh
+
+crontab -e 
+*/10 * * * * reshenienew.sh
+
+
